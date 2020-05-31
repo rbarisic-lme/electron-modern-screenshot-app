@@ -1,0 +1,17 @@
+/* Icons by FontAwesome: https://fontawesome.com/license */
+
+body {pointer-events: none}
+* {pointer-events: all;}
+
+.draggable {
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+
+div.icon {
+
+}
+
+div.icon svg {
+  height: 0.7rem;
+}
