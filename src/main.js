@@ -8,6 +8,8 @@ import { remote } from 'electron'
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
 
+import mitt from 'mitt'
+
 const requireIcon = require.context(
   // The relative path of the components folder
   './components/icons',
@@ -63,5 +65,6 @@ console.log('loaded')
 
 new Vue({
   store,
+  mitt,
   render: h => h(App)
 }).$mount('#app')

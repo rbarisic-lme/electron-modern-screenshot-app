@@ -1,6 +1,6 @@
 'use strict'
 
-import { screen, app, protocol, BrowserWindow } from 'electron'
+import { globalShortcut, screen, app, protocol, BrowserWindow } from 'electron'
 import {
   createProtocol,
   /* installVueDevtools */
@@ -21,6 +21,7 @@ app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
+    globalShortcut.unregisterAll()
     app.quit()
   }
 })
@@ -54,8 +55,9 @@ app.on('ready', async () => {
 
   let display = screen.getPrimaryDisplay()
 
-  let windowHeight = 400;
-  let windowWidth = 600;
+  // let windowHeight = 320;
+  let windowHeight = 1000;
+  let windowWidth = 800;
 
   win = new BrowserWindow({ width: windowWidth, height: windowHeight, frame: false,
     y: display.bounds.height - windowHeight - 60,

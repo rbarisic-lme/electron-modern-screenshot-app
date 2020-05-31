@@ -7,7 +7,8 @@ const {desktopCapturer} = require('electron');
  * @param imageFormat {String} Format of the image to generate ('image/jpeg' or 'image/png')
  **/
 function fullscreenCapture(callback, imageFormat) {
-    imageFormat = imageFormat || 'image/png';
+    // imageFormat = imageFormat || 'image/png';
+    imageFormat = imageFormat || 'image/jpeg';
 
     let handleStream = (stream) => {
         // Create hidden video tag
@@ -58,8 +59,6 @@ function fullscreenCapture(callback, imageFormat) {
     };
 
     desktopCapturer.getSources({ types: ['window', 'screen'] }).then(async sources => {
-        console.log(sources);
-
         for (const source of sources) {
             // Filter: main screen
             if ((source.name === "Entire screen") || (source.name === "Screen 1") || (source.name === "Screen 2")) {
@@ -71,9 +70,9 @@ function fullscreenCapture(callback, imageFormat) {
                                 chromeMediaSource: 'desktop',
                                 chromeMediaSourceId: source.id,
                                 minWidth: 1280,
-                                maxWidth: 4000,
+                                maxWidth: 64000,
                                 minHeight: 720,
-                                maxHeight: 4000
+                                maxHeight: 64000
                             }
                         }
                     });

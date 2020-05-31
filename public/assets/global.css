@@ -9,9 +9,11 @@ body {pointer-events: none}
 }
 
 div.icon {
-
+  display: inline-block;
+  margin-right: 6px;
 }
 
 div.icon svg {
-  height: 0.7rem;
+  display: inline-block;
+  height: 0.9rem;
 }
