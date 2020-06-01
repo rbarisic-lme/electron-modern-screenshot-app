@@ -5,6 +5,8 @@ import {
   createProtocol,
   /* installVueDevtools */
 } from 'vue-cli-plugin-electron-builder/lib'
+
+import TrayIcon from './trayIcon.js'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 process.env.windir = 'C:\\Windows\\'

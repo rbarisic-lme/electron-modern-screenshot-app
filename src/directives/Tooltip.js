@@ -49,7 +49,9 @@ export const TooltipOn = {
   name: 'TooltipOn',
   inserted() {
   },
-  bind(el, bind/*, vnode*/) {
+  bind(/*el, bind, vnode*/) {
+  },
+  update(el, bind) {
     Vue.nextTick(function () {
       if (bind.value === true) {
         document.getElementById('app').appendChild(tooltip);
@@ -67,8 +69,5 @@ export const TooltipOn = {
         }, 1500)
       }
     });
-  },
-  update() {
-
   }
 } 
