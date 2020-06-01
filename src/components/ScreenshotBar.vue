@@ -1,23 +1,25 @@
 <template>
   <div class="screenshot-bar">
-    <button class="sbar-button" @click="copyToClipboard">
+    <button class="sbar-button" @click="copyToClipboard" v-tooltip="'Edited'" v-tooltip-on="true">
+      <CropIcon/> Edit
+    </button>
+    <button class="sbar-button" @click="copyToClipboard" v-tooltip="'successfully saved!'" v-tooltip-on="2">
       <ClipboardIcon/> Copy to Clipboard
     </button>
     <button class="sbar-button" @click="saveAs">
       <SaveIcon/> Save
     </button>
-
-    <button class="sbar-button" @click="$store.dispatch('makeScreenshot'); $store.dispatch('resetScreenshot')">Make Screenshot</button>
   </div>
 </template>
 
 <script>
   import fs from 'fs'
   import { remote } from 'electron'
-  console.log(fs)
+  import * as imageConversion from 'image-conversion'
   // import Vue from 'vue';
   // import VueToast from 'vue-toast-notification';
   // import 'vue-toast-notification/dist/theme-default.css';
+  import { mapState } from 'vuex'
 
   export default {
     name: 'ScreenshotBar',
@@ -26,42 +28,69 @@
     },
     data: function() {
       return {
-
       }
     },
     props: {
-      clickFn: Function
+      screenshotId: Number,
     },
     computed: {
-
+      imageAsFile() {
+        return 2
+      },
+      image() {
+        let tempImg = new Image();
+        tempImg.src = this.imagePointer;
+        return new Image(this.imagePointer);
+      },
+      imagePointer() {
+        return this.screenshot[this.screenshotId]
+      },
+      ...mapState(['screenshot'])
     },
     mounted() {
+      // console.log(this.screenshot)
+      // console.log(this.imagePointer)
     },
     watch: {
 
     },
     methods: {
-      resetApp() {
-        this.$store.dispatch('resetScreenshot', null);
-      },
-      copyToClipboard() {
-        console.log('copy to clipboard')
-      },
-      saveAs() {
-        console.log('save as')
-        remote.dialog.showSaveDialog().then(res => {
-          console.log(res)
-          if (res.canceled === true) {
-            return 0
-            // throw new Error('Dialog cancelled')
-          }
-          fs.writeFileSync(res.filePath, this.screenshot);
+      async convertToFile() {
+        const blob = await imageConversion.dataURLtoFile(this.imagePointer, "image/png")
 
-          this.resetApp()
-        });
-        // }).catch(err => {
-        //   console.log(err)
-        // })
+        return blob
+      },
+      resetApp() {
+        this.$store.dispatch('resetScreenshots', null);
+      },
+      async copyToClipboard() {
+        // navigator.clipboard.writeText(blob)
+        try {
+          const blob = await this.convertToFile();
+          // navigator.clipboard.write(new ClipboardItem({[blob.type]: blob}))
+          // const data = await fetch(myFile);
+          // const blob = await data.blob();
+          await navigator.clipboard.write([
+            new ClipboardItem({[blob.type]: blob})
+          ]);
+          console.log('Image copied.');
+        } catch(err) { console.error(err.name, err.message); }
+
+      },
+      async saveAs() {
+        try {
+          const blob = await this.convertToFile();
+
+          remote.dialog.showSaveDialog().then(res => {
+            console.log(res)
+            if (res.canceled === true) {
+              return 0
+            } else {
+              fs.writeFileSync(res.filePath, blob);
+            }
+          });
+
+        } catch(err) { console.error(err.name, err.message); }
       }
     },
   }
@@ -70,21 +99,16 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="css">
   .screenshot-bar {
-    margin-top: 12px;
+    position: absolute;
+    background: rgba(0,0,0,0.7);
+    display:  flex;
+    bottom: 0;
+    left: 2px;
+    width: calc(100% - 4px - 8px);
+    padding:  4px;
+    /* opacity: 0; */
   }
-
-  .sbar-button {
-    display: inline-block;
-    border: 1px solid #666;
-    padding:  12px;
-    background:  none;
-    margin-right:  12px;
-    color:  #ccc;
-  }
-  .sbar-button:last-child {
-    margin-right: 0;
-  }
-  .sbar-button:hover {
-    border: 1px solid orange;
+  .screenshot-bar:hover {
+    /* opacity: 1; */
   }
 </style>

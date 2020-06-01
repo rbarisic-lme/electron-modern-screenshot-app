@@ -1,13 +1,15 @@
 <template>
   <div id="app">
     <!-- <FlashScreen v-if="screenshot !== null"/> -->
-    <MainComponent/>
+    <MainComponent v-if="screenshot.length > 0"/>
+    <button class="sbar-button" @click="$store.dispatch('makeScreenshot');">Make Screenshot</button>
   </div>
 </template>
 
 <script>
 // import FlashScreen from './components/FlashScreen.vue'
 import MainComponent from './components/MainComponent.vue'
+import { mapState } from 'vuex'
 
 import { remote } from 'electron'
 
@@ -22,8 +24,10 @@ export default {
     }
   },
   computed: {
+    ...mapState(['screenshot'])
   },
   mounted() {
+    remote.globalShortcut.unregisterAll();
     remote.globalShortcut.register('CommandOrControl+Shift+Printscreen', () => {
         this.makeScreenshot();
     })
@@ -32,7 +36,7 @@ export default {
 
   },
   destroyed() {
-    remote.globalShortcut.unregisterAll()
+    // remote.globalShortcut.unregisterAll()
   },
   methods: {
     //win.focus() on capture

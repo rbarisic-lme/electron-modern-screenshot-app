@@ -21,7 +21,7 @@ app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
-    globalShortcut.unregisterAll()
+    // globalShortcut.unregisterAll()
     app.quit()
   }
 })
@@ -56,12 +56,15 @@ app.on('ready', async () => {
   let display = screen.getPrimaryDisplay()
 
   // let windowHeight = 320;
-  let windowHeight = 1000;
+  let windowHeight = 320;
   let windowWidth = 800;
 
-  win = new BrowserWindow({ width: windowWidth, height: windowHeight, frame: false,
+  let winSettings = {
+    width: windowWidth,
+    height: windowHeight,
     y: display.bounds.height - windowHeight - 60,
     x: (display.bounds.width / 2) - (windowWidth / 2),
+    frame: false,
     alwaysOnTop: true,
     backgroundColor: "#00FFFFFF",
     transparent: true,
@@ -73,8 +76,21 @@ app.on('ready', async () => {
     movable: false,
 
     webPreferences: {
-    nodeIntegration: true
-  } })
+      nodeIntegration: true
+    }
+  };
+
+  if (isDevelopment) {
+    winSettings.frame = true;
+    winSettings.closable = true;
+    winSettings.resizable = true;
+    winSettings.movable = true;
+    winSettings.alwaysOnTop= false;
+    winSettings.height = 700;
+    winSettings.width = 1200;
+  }
+
+  win = new BrowserWindow(winSettings)
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode

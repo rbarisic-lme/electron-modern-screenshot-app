@@ -13,7 +13,11 @@
   },
   "main": "background.js",
   "dependencies": {
+    "clipboard-polyfill": "^2.8.6",
     "core-js": "^3.6.5",
+    "image-conversion": "^2.1.1",
+    "lodash": "^4.17.15",
+    "v-tooltip": "^2.0.3",
     "vue": "^2.6.11",
     "vuex": "^3.4.0"
   },
@@ -41,7 +45,15 @@
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "vue/no-unused-vars": "off",
+      "vue/no-confusing-v-for-v-if": "off",
+      "vue/no-v-html": "off",
+      "vue/no-unused-components": "off"
+    },
+    "globals": {
+      "ClipboardItem": "readonly"
+    }
   },
   "browserslist": [
     "> 1%",

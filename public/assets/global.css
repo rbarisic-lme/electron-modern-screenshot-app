@@ -3,11 +3,11 @@
 body {pointer-events: none}
 * {pointer-events: all;}
 
-.draggable {
+/* .draggable {
   -webkit-app-region: drag;
   app-region: drag;
 }
-
+ */
 div.icon {
   display: inline-block;
   margin-right: 6px;
@@ -16,4 +16,19 @@ div.icon {
 div.icon svg {
   display: inline-block;
   height: 0.9rem;
+}
+
+button, .btn {
+  display: inline-block;
+  border: 1px solid #555;
+  padding:  8px;
+  background: rgba(0,0,0,0.7);
+  margin-right:  8px;
+  color:  #ccc;
+}
+button:last-child, .btn:last-child {
+  margin-right: 0;
+}
+button:hover, .btn:hover {
+  border: 1px solid orange;
 }

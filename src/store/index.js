@@ -6,30 +6,38 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    screenshot: new Set()
+    screenshot: new Array(),
+    mouseActive: false,
+    destroyIntervalId: null,
   },
   mutations: {
     setScreenshot(state, val) {
-      let copy = new Set(state.screenshot);
+      let copy = state.screenshot.slice();
       val;
-      copy.add(val);
+      copy.push(val);
       state.screenshot = copy;
       copy = null;
       // console.log(state.screenshot.size)
     },
-    resetScreenshot(state) {
-      state.screenshot = new Set();
+    resetScreenshots(state) {
+      state.screenshot = new Array();
+    },
+    setMouseActive(state, bool) {
+      state.mouseActive = bool
+    },
+    setDestroyIntervalId(state, id) {
+      state.destroyIntervalId = id
     }
   },
   actions: {
     setScreenshot(store, val) {
       store.commit('setScreenshot', val)
     },
-    resetScreenshot(store) {
-      store.commit('resetScreenshot')
+    resetScreenshots(store) {
+      store.commit('resetScreenshots')
     },
     makeScreenshot(store) {
-      store.dispatch('resetScreenshot');
+      store.dispatch('resetScreenshots');
       var audio = new Audio(require('@/assets/shutter_sound1.flac'))
       audio.play();
 
@@ -39,6 +47,9 @@ export default new Vuex.Store({
     }
   },
   getters: {
+    destroyIntervalId(state) {
+      return state.destroyIntervalId
+    },
     getScreenshot(state) {
       return state.screenshot
     }

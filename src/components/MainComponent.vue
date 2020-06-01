@@ -1,21 +1,27 @@
 <template>
-  <div class="main-component" v-if="screenshot !== null">
+  <div class="main-component">
 
     <div class="visible-group">
       <div class="screenshots">
-        <div class="image" v-for="(key, val) of screenshot" :key="val">
+        <div class="image" v-for="(key, index) of screenshot" :key="index">
           <img alt="" :src="key">
+          <ScreenshotBar :screenshotId="index"/>
         </div>
       </div>
-      {{screenshot[0]}}
-      <ScreenshotBar/>
-    </div>
 
+      <div>
+        <TimeUntilDestroy v-if="useTimer" :timer="8000" :parentRef="$el" />
+        <button v-else class="sbar-button" @click="$store.dispatch('resetScreenshots')">
+          Close</button>
+      </div>
+
+    </div>
   </div>
 </template>
 
 <script>
   import { mapState } from 'vuex'
+  import TimeUntilDestroy from '@/components/TimeUntilDestroy.vue'
   import ScreenshotBar from '@/components/ScreenshotBar.vue'
   import remote from 'electron'
 
@@ -24,14 +30,20 @@ export default {
   props: {
   },
   components: {
+    TimeUntilDestroy,
     ScreenshotBar,
   },
   data() {
     return {
+      useTimer: false,
       window: remote.webFrame,
+      loaded: false,
     }
   },
   computed: {
+    mainRef() {
+      return this.$refs['mainComponent']
+    },
     ...mapState(['screenshot'])
   },
   watch: {
@@ -44,6 +56,16 @@ export default {
 
   },
   mounted() {
+    this.loaded = true
+
+    this.$el.addEventListener('mouseenter', () => {
+      this.$store.commit('setMouseActive', true)
+      console.log('its entering')
+    });
+    this.$el.addEventListener('mouseleave', () => {
+      console.log('its leaving')
+      this.$store.commit('setMouseActive', false)
+    });
   }
 }
 </script>
@@ -56,20 +78,6 @@ export default {
   display: inline-block;
 }
 
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
 .visible-group {
   background:  rgba(0,0,0,0.5);
   padding:  12px;
@@ -82,14 +90,32 @@ a {
 }
 
 .screenshots .image {
+  position: relative;
   display: block;
   height:  200px;
+  margin: 8px;
 }
 
 .screenshots .image img {
-  height:  calc(100% - 4px - 8px);
+  height:  calc(100% - 4px);
   padding: 2px;
-  margin:  8px;
-  border:  1px solid rgba(255,255,255,0.5);
+  border:  1px solid rgba(255,255,255,0.3);
+}
+
+.screenshots .image img:hover {
+  border:  1px solid #fff;
+}
+
+.screenshots .image .screenshot-bar {
+  transition: opacity .1s ease-in-out;
+  opacity: 0;
+}
+
+.screenshots .image:hover .screenshot-bar {
+  opacity:  0.5;
+}
+
+.screenshots .image .screenshot-bar:hover {
+  opacity: 1;
 }
 </style>

@@ -8,7 +8,12 @@ import { remote } from 'electron'
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
 
-import mitt from 'mitt'
+// import mitt from 'mitt'
+
+import {Tooltip, TooltipOn} from '@/directives/Tooltip.js'
+
+Vue.directive('tooltip', Tooltip)
+Vue.directive('tooltip-on', TooltipOn)
 
 const requireIcon = require.context(
   // The relative path of the components folder
@@ -65,6 +70,7 @@ console.log('loaded')
 
 new Vue({
   store,
-  mitt,
+  // mitt,
+  
   render: h => h(App)
 }).$mount('#app')
