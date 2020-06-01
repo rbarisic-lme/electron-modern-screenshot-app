@@ -84,7 +84,7 @@ app.on('ready', async () => {
     }
   };
 
-  if (isDevelopment) {
+  if (!isDevelopment) {
     winSettings.frame = true;
     winSettings.closable = true;
     winSettings.resizable = true;
