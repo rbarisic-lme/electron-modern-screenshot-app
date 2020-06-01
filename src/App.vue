@@ -10,6 +10,8 @@
 // import FlashScreen from './components/FlashScreen.vue'
 import MainComponent from './components/MainComponent.vue'
 
+import { ipcRenderer } from 'electron'
+
 export default {
   name: 'App',
   components: {
@@ -29,6 +31,12 @@ export default {
     this.$remote.globalShortcut.unregisterAll();
     this.$remote.globalShortcut.register('CommandOrControl+Shift+Printscreen', () => {
         this.makeScreenshot();
+    })
+
+    ipcRenderer.on('vuex', (event, arg) => {
+      if (arg === 'makeScreenshot') {
+        this.$store.dispatch('makeScreenshot');        
+      }
     })
   },
   watch: {

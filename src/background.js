@@ -84,7 +84,7 @@ app.on('ready', async () => {
     }
   };
 
-  if (!isDevelopment) {
+  if (isDevelopment) {
     winSettings.frame = true;
     winSettings.closable = true;
     winSettings.resizable = true;
@@ -95,6 +95,8 @@ app.on('ready', async () => {
   }
 
   win = new BrowserWindow(winSettings)
+
+  const trayIcon = TrayIcon(win)
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -109,7 +111,6 @@ app.on('ready', async () => {
   win.on('closed', () => {
     win = null
   })
-
 })
 
 // Exit cleanly on request from parent process in development mode.
