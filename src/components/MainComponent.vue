@@ -10,7 +10,7 @@
       </div>
 
       <div>
-        <TimeUntilDestroy v-if="useTimer" :timer="8000" :parentRef="$el" />
+        <TimeUntilDestroy v-if="useTimer" :timer="8000" :parentRef="$el"/>
         <button v-else class="sbar-button" @click="$store.dispatch('resetScreenshots')">
           Close</button>
       </div>

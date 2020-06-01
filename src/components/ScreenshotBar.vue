@@ -1,6 +1,6 @@
 <template>
   <div class="screenshot-bar">
-    <button class="sbar-button" @click="copyToClipboard" v-tooltip="'Edited'" v-tooltip-on="true">
+    <button class="sbar-button" @click="editImage" v-tooltip="'Edited'" v-tooltip-on="true">
       <CropIcon/> Edit
     </button>
     <button class="sbar-button" @click="copyToClipboard" v-tooltip="'successfully saved!'" v-tooltip-on="2">
@@ -19,7 +19,7 @@
   // import VueToast from 'vue-toast-notification';
   // import 'vue-toast-notification/dist/theme-default.css';
   import { mapState } from 'vuex'
-
+  
   export default {
     name: 'ScreenshotBar',
     components: {
@@ -33,9 +33,6 @@
       screenshotId: Number,
     },
     computed: {
-      screenshotCount() {
-        return this.$store.getters['getScreenshotCount']
-      },
       // image() {
       //   return new Image(this.imagePointer);
       // },
@@ -50,17 +47,59 @@
 
     },
     methods: {
-      async convertToFile() {
-        let blob = await imageConversion.dataURLtoFile(this.screenshot[this.screenshotCount], "image/png")
+      async convertBase64ToBlob() {
+        let blob = await imageConversion.dataURLtoFile(this.screenshot[this.screenshotId], "image/png")
         return blob
       },
       resetApp() {
         this.$store.dispatch('resetScreenshots', null);
       },
+      editImage() {
+
+        // console.log(process.env.windir = 'C:\\Windows')
+
+        // let Registry = require('winreg');
+        // let regKey = new Registry({                                       // new operator is optional
+        //   hive: Registry.HKCU,                                        // open registry hive HKEY_CURRENT_USER
+        //   key:  '\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' // key containing autostart programs
+        // });
+
+        // regKey.values((err, items) => {
+        //   console.log(err);
+        //   console.log(items);
+        // });
+
+        // // list autostart programs
+        // regKey.values(function (err, items /* array of RegistryItem */) {
+        //   if (err)
+        //     console.log('ERROR: '+err);
+        //   else
+        //     for (var i=0; i<items.length; i++)
+        //       console.log('ITEM: '+items[i].name+'\t'+items[i].type+'\t'+items[i].value);
+        //     }
+        // );
+
+        let app = this.$remote.app
+        var basepath = app.getAppPath();
+
+        let child = require('child_process').execFile;
+        let path = require('path')
+
+        console.log(basepath)
+        console.log(basepath)
+        console.log(basepath)
+        let executablePath = path.join(basepath, 'bundled/openPhoto.cmd');
+        let parameters = [""];
+
+        child(executablePath, parameters, function(err, data) {
+             console.log(err)
+             console.log(data.toString());
+        });
+      },
       async copyToClipboard() {
         // navigator.clipboard.writeText(blob)
         try {
-          let blob = await this.convertToFile();
+          let blob = await this.convertBase64ToBlob();
           // navigator.clipboard.write(new ClipboardItem({[blob.type]: blob}))
           // let data = await fetch(myFile);
           // let blob = await data.blob();
@@ -73,7 +112,7 @@
       },
       async saveAs() {
         try {
-          // let blob = await this.convertToFile();
+          // let blob = await this.convertBase64ToBlob();
 
           let res = await this.$remote.dialog.showSaveDialog()
 

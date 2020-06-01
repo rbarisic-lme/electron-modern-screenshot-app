@@ -2,6 +2,9 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import captureScreen from '@/services/captureScreen.js'
 
+import { webFrame } from 'electron'
+import { remote } from 'electron'
+
 Vue.use(Vuex)
 
 let shutterSound = new Audio(require('@/assets/shutter_sound1.ogg'))
@@ -25,14 +28,20 @@ export default new Vuex.Store({
       // console.log(state.screenshot.size)
     },
     resetScreenshots(state) {
+      console.log(webFrame.getResourceUsage())
       state.screenshot = [];
+      remote.getCurrentWindow().webContents.session.clearCache(() => {
+        console.log("cache cleared")
+      })
+      webFrame.clearCache();
+      console.log(webFrame.getResourceUsage())
     },
     setMouseActive(state, bool) {
       state.mouseActive = bool
     },
     setDestroyIntervalId(state, id) {
       state.destroyIntervalId = id
-    }
+    } 
   },
   actions: {
     setScreenshot(store, val) {

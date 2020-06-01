@@ -22,7 +22,6 @@ export const Tooltip = {
   bind(el, bind) {
     // Use this to get real data from the DOM
     Vue.nextTick(function () {
-      console.log(el.getBoundingClientRect());
       // DOM updated
 
       styles = [
@@ -49,7 +48,6 @@ export const Tooltip = {
 export const TooltipOn = {
   name: 'TooltipOn',
   inserted() {
-    console.log('TOOLTIP ON ON ON ON')
   },
   bind(el, bind/*, vnode*/) {
     Vue.nextTick(function () {
@@ -59,9 +57,8 @@ export const TooltipOn = {
         for(let style of styles) {
           try {
             tooltip.style[style[0]] = style[1] 
-            console.log('success');
           } catch(err) {
-            console.log('DB Error: ' + err.message);
+            console.log('Tooltip Error: ' + err.message);
           }
         }
 
