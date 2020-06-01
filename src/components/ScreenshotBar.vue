@@ -14,7 +14,6 @@
 
 <script>
   import fs from 'fs'
-  import { remote } from 'electron'
   import * as imageConversion from 'image-conversion'
   // import Vue from 'vue';
   // import VueToast from 'vue-toast-notification';
@@ -34,30 +33,25 @@
       screenshotId: Number,
     },
     computed: {
-      imageAsFile() {
-        return 2
+      screenshotCount() {
+        return this.$store.getters['getScreenshotCount']
       },
-      image() {
-        let tempImg = new Image();
-        tempImg.src = this.imagePointer;
-        return new Image(this.imagePointer);
-      },
-      imagePointer() {
-        return this.screenshot[this.screenshotId]
-      },
+      // image() {
+      //   return new Image(this.imagePointer);
+      // },
+      // imagePointer() {
+      //   return this.screenshot[this.screenshotId]
+      // },
       ...mapState(['screenshot'])
     },
     mounted() {
-      // console.log(this.screenshot)
-      // console.log(this.imagePointer)
     },
     watch: {
 
     },
     methods: {
       async convertToFile() {
-        const blob = await imageConversion.dataURLtoFile(this.imagePointer, "image/png")
-
+        let blob = await imageConversion.dataURLtoFile(this.screenshot[this.screenshotCount], "image/png")
         return blob
       },
       resetApp() {
@@ -66,30 +60,35 @@
       async copyToClipboard() {
         // navigator.clipboard.writeText(blob)
         try {
-          const blob = await this.convertToFile();
+          let blob = await this.convertToFile();
           // navigator.clipboard.write(new ClipboardItem({[blob.type]: blob}))
-          // const data = await fetch(myFile);
-          // const blob = await data.blob();
+          // let data = await fetch(myFile);
+          // let blob = await data.blob();
           await navigator.clipboard.write([
             new ClipboardItem({[blob.type]: blob})
           ]);
-          console.log('Image copied.');
+          // console.log('Image copied.');
         } catch(err) { console.error(err.name, err.message); }
 
       },
       async saveAs() {
         try {
-          const blob = await this.convertToFile();
+          // let blob = await this.convertToFile();
 
-          remote.dialog.showSaveDialog().then(res => {
-            console.log(res)
-            if (res.canceled === true) {
-              return 0
-            } else {
-              fs.writeFileSync(res.filePath, blob);
-            }
-          });
+          let res = await this.$remote.dialog.showSaveDialog()
 
+          if (res.canceled === true) {
+            return 0
+          } else {
+
+            // fs.appendFileSync(res.filePath, this.screenshot[this.screenshotId].split(';base64,').pop(), {encoding: 'base64'})
+            fs.appendFileSync(res.filePath, this.screenshot[this.screenshotId].slice(23), {encoding: 'base64'})
+            // let buffer = await blob.arrayBuffer();
+            // fs.appendFileSync(res.filePath, Buffer.from(buffer));
+            // buffer = null;
+            // blob = null;
+            // res = null;
+          }
         } catch(err) { console.error(err.name, err.message); }
       }
     },

@@ -26,23 +26,23 @@ export const Tooltip = {
       // DOM updated
 
       styles = [
-        ['position', 'fixed'],
-        ['left', el.getBoundingClientRect().x + 'px'],
-        ['top', el.getBoundingClientRect().y - 32 - 8 + 'px'],
-        ['color', '#fff'],
-        ['background', '#000'],
-        ['padding', '8px']
+      ['position', 'fixed'],
+      ['left', el.getBoundingClientRect().x + 'px'],
+      ['top', el.getBoundingClientRect().y - 32 - 8 + 'px'],
+      ['color', '#fff'],
+      ['background', '#000'],
+      ['padding', '8px']
       ];
 
       tooltip.innerHTML = `
-        <div class="tooltip-content">
-          ${bind.value}
-        </div>
+      <div class="tooltip-content">
+      ${bind.value}
+      </div>
       `
     })
   },
   update() {
-    
+
   }
 }
 
@@ -53,18 +53,22 @@ export const TooltipOn = {
   },
   bind(el, bind/*, vnode*/) {
     Vue.nextTick(function () {
-    if (bind.value === true) {
-      document.getElementById('app').appendChild(tooltip);
+      if (bind.value === true) {
+        document.getElementById('app').appendChild(tooltip);
 
-      for(let style of styles) {
-        try {
-          tooltip.style[style[0]] = style[1] 
-          console.log('success');
-        } catch(err) {
-          console.log('DB Error: ' + err.message);
+        for(let style of styles) {
+          try {
+            tooltip.style[style[0]] = style[1] 
+            console.log('success');
+          } catch(err) {
+            console.log('DB Error: ' + err.message);
+          }
         }
+
+        setTimeout(() => {
+          tooltip.remove();
+        }, 1500)
       }
-    }
     });
   },
   update() {

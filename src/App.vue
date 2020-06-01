@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- <FlashScreen v-if="screenshot !== null"/> -->
-    <MainComponent v-if="screenshot.length > 0"/>
+    <MainComponent v-if="screenshotCount > 0"/>
     <button class="sbar-button" @click="$store.dispatch('makeScreenshot');">Make Screenshot</button>
   </div>
 </template>
@@ -9,9 +9,6 @@
 <script>
 // import FlashScreen from './components/FlashScreen.vue'
 import MainComponent from './components/MainComponent.vue'
-import { mapState } from 'vuex'
-
-import { remote } from 'electron'
 
 export default {
   name: 'App',
@@ -24,11 +21,13 @@ export default {
     }
   },
   computed: {
-    ...mapState(['screenshot'])
+    screenshotCount() {
+      return this.$store.getters['getScreenshotCount']
+    },
   },
   mounted() {
-    remote.globalShortcut.unregisterAll();
-    remote.globalShortcut.register('CommandOrControl+Shift+Printscreen', () => {
+    this.$remote.globalShortcut.unregisterAll();
+    this.$remote.globalShortcut.register('CommandOrControl+Shift+Printscreen', () => {
         this.makeScreenshot();
     })
   },
@@ -36,12 +35,11 @@ export default {
 
   },
   destroyed() {
-    // remote.globalShortcut.unregisterAll()
+    // this.$remote.globalShortcut.unregisterAll()
   },
   methods: {
     //win.focus() on capture
     makeScreenshot() {
-      // console.log(captureScreen)
       this.$store.dispatch('makeScreenshot')
     }
   },

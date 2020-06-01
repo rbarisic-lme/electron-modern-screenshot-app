@@ -10,6 +10,8 @@ import camelCase from 'lodash/camelCase'
 
 // import mitt from 'mitt'
 
+Vue.prototype.$remote = remote;
+
 import {Tooltip, TooltipOn} from '@/directives/Tooltip.js'
 
 Vue.directive('tooltip', Tooltip)

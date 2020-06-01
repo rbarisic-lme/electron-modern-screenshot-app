@@ -4,23 +4,28 @@ import captureScreen from '@/services/captureScreen.js'
 
 Vue.use(Vuex)
 
+let shutterSound = new Audio(require('@/assets/shutter_sound1.ogg'))
+
+
 export default new Vuex.Store({
   state: {
-    screenshot: new Array(),
+    screenshot: [],
     mouseActive: false,
     destroyIntervalId: null,
   },
   mutations: {
     setScreenshot(state, val) {
-      let copy = state.screenshot.slice();
-      val;
-      copy.push(val);
-      state.screenshot = copy;
-      copy = null;
+      // let copy = state.screenshot.slice();
+      // val;
+      // copy.push(val);
+      // state.screenshot = copy;
+      // copy = null;
+      state.screenshot.push(val);
+      state.screenshot = state.screenshot.slice(0,2);  
       // console.log(state.screenshot.size)
     },
     resetScreenshots(state) {
-      state.screenshot = new Array();
+      state.screenshot = [];
     },
     setMouseActive(state, bool) {
       state.mouseActive = bool
@@ -38,17 +43,19 @@ export default new Vuex.Store({
     },
     makeScreenshot(store) {
       store.dispatch('resetScreenshots');
-      var audio = new Audio(require('@/assets/shutter_sound1.flac'))
-      audio.play();
+      shutterSound.play();
 
       captureScreen(img => {
-        store.dispatch('setScreenshot', img)
+        store.commit('setScreenshot', img)
       });
     }
   },
   getters: {
     destroyIntervalId(state) {
       return state.destroyIntervalId
+    },
+    getScreenshotCount(state) {
+      return state.screenshot.length
     },
     getScreenshot(state) {
       return state.screenshot

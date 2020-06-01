@@ -3,9 +3,9 @@
 
     <div class="visible-group">
       <div class="screenshots">
-        <div class="image" v-for="(key, index) of screenshot" :key="index">
-          <img alt="" :src="key">
-          <ScreenshotBar :screenshotId="index"/>
+        <div class="image" v-for="index of screenshotCount" :key="index">
+          <img alt="" :src="screenshot[index-1]">
+          <ScreenshotBar :screenshotId="index-1"/>
         </div>
       </div>
 
@@ -23,7 +23,6 @@
   import { mapState } from 'vuex'
   import TimeUntilDestroy from '@/components/TimeUntilDestroy.vue'
   import ScreenshotBar from '@/components/ScreenshotBar.vue'
-  import remote from 'electron'
 
 export default {
   name: 'MainComponent',
@@ -36,7 +35,7 @@ export default {
   data() {
     return {
       useTimer: false,
-      window: remote.webFrame,
+      window: this.$remote.webFrame,
       loaded: false,
     }
   },
@@ -44,7 +43,10 @@ export default {
     mainRef() {
       return this.$refs['mainComponent']
     },
-    ...mapState(['screenshot'])
+    screenshotCount() {
+      return this.$store.getters['getScreenshotCount']
+    },
+    ...mapState(['screenshot']),
   },
   watch: {
 
@@ -76,6 +78,7 @@ export default {
   margin:  0 auto;
   width:  auto;
   display: inline-block;
+  box-shadow: 2px 2px 20px 0 rgba(0,0,0,0.5);
 }
 
 .visible-group {
