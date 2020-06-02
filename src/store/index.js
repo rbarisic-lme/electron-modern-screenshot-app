@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import captureScreen from '@/services/captureScreen.js'
 
-import { webFrame, remote, ipcRenderer } from 'electron'
+import { webFrame, remote } from 'electron'
 
 Vue.use(Vuex)
 
@@ -10,24 +10,24 @@ let shutterSound = new Audio(require('@/assets/shutter_sound1.ogg'))
 
 export default new Vuex.Store({
   state: {
-    screenshot: [],
+    screenshots: [],
     mouseActive: false,
     destroyIntervalId: null,
   },
   mutations: {
-    setScreenshot(state, val) {
-      // let copy = state.screenshot.slice();
+    setScreenshots(state, data) {
+      // let copy = state.screenshots.slice();
       // val;
       // copy.push(val);
-      // state.screenshot = copy;
+      // state.screenshots = copy;
       // copy = null;
-      state.screenshot.push(val);
-      state.screenshot = state.screenshot.slice(0,2);  
-      // console.log(state.screenshot.size)
+      state.screenshots.push(data);
+      state.screenshots = state.screenshots.slice(0,2);  
+      // console.log(state.screenshots.size)
     },
     resetScreenshots(state) {
       console.log(webFrame.getResourceUsage())
-      state.screenshot = [];
+      state.screenshots = [];
       remote.getCurrentWindow().webContents.session.clearCache(() => {
         console.log("cache cleared")
       })
@@ -42,18 +42,19 @@ export default new Vuex.Store({
     } 
   },
   actions: {
-    setScreenshot(store, val) {
-      store.commit('setScreenshot', val)
-    },
+    // setScreenshot(store, val) {
+    //   store.commit('setScreenshots', val)
+    // },
     resetScreenshots(store) {
       store.commit('resetScreenshots')
     },
-    makeScreenshot(store) {
+    makeScreenshots(store) {
       store.dispatch('resetScreenshots');
+
       shutterSound.play();
 
       captureScreen(img => {
-        store.commit('setScreenshot', img)
+        store.commit('setScreenshots', {timestamp: Date.now(), img: img})
       });
     }
   },
@@ -62,10 +63,15 @@ export default new Vuex.Store({
       return state.destroyIntervalId
     },
     getScreenshotCount(state) {
-      return state.screenshot.length
+      return state.screenshots.length
     },
-    getScreenshot(state) {
-      return state.screenshot
+    getScreenshots(state) {
+      return state.screenshots
+    },
+    getScreenshotByTimestamp(state) {
+      return keyword => state.screenshots.filter(item => {
+        return item.timestamp === keyword
+      })[0]
     }
   },
   modules: {

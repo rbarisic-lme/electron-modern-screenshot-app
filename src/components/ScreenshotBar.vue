@@ -6,7 +6,7 @@
     <button class="sbar-button" @click="copyToClipboard" v-tooltip="'copied to clipboard'" v-tooltip-on="copiedToClipboard">
       <ClipboardIcon/> Copy to Clipboard
     </button>
-    <button class="sbar-button" @click="saveAs">
+    <button class="sbar-button" @click="saveAs" v-tooltip="'File saved'" v-tooltip-on="fileSaved">
       <SaveIcon/> Save
     </button>
   </div>
@@ -15,12 +15,11 @@
 <script>
   import fs from 'fs'
   import * as imageConversion from 'image-conversion'
-  // import Vue from 'vue';
-  // import VueToast from 'vue-toast-notification';
-  // import 'vue-toast-notification/dist/theme-default.css';
   import { mapState } from 'vuex'
-  
   import Vue from 'vue';
+
+  import path from 'path';
+  import os from 'os';
 
   export default {
     name: 'ScreenshotBar',
@@ -30,24 +29,44 @@
     data: function() {
       return {
         copiedToClipboard: false,
-        copiedToClipboardTimerId: null
+        copiedToClipboardTimerId: null,
+        fileSaved: false,
+        fileSavedTimerId: null,
+        tempFile: null,
+
       }
     },
     props: {
       screenshotId: Number,
+      screenshotTimestamp: Number,
     },
     computed: {
       // image() {
       //   return new Image(this.imagePointer);
       // },
       // imagePointer() {
-      //   return this.screenshot[this.screenshotId]
+      //   return this.screenshots
       // },
-      ...mapState(['screenshot'])
+      app() { return this.$remote.app },
+      basepath() { return this.app.getAppPath() },
+      tmpFilePath() { return this.basepath + '/temp/'+this.screenshotTimestamp+'.jpg'; },
+      screenshot() {
+        return this.$store.getters.getScreenshotByTimestamp(this.screenshotTimestamp)
+      }
     },
     mounted() {
+
     },
     watch: {
+      fileSaved () {
+        if (this.fileSaved === true) {
+          if (this.fileSavedTimerId !== null) {
+            clearTimeout(this.fileSavedTimerId);
+            this.fileSavedTimerId = null;
+          }
+          this.fileSavedTimerId = setTimeout(() => { this.fileSaved = false}, 500)
+        }
+      },
       copiedToClipboard () {
         if (this.copiedToClipboard === true) {
           if (this.copiedToClipboardTimerId !== null) {
@@ -60,14 +79,13 @@
     },
     methods: {
       async convertBase64ToBlob() {
-        let blob = await imageConversion.dataURLtoFile(this.screenshot[this.screenshotId], "image/png")
+        let blob = await imageConversion.dataURLtoFile(this.screenshot.img, "image/png")
         return blob
       },
       resetApp() {
         this.$store.dispatch('resetScreenshots', null);
       },
       editImage() {
-
         // console.log(process.env.windir = 'C:\\Windows')
 
         // let Registry = require('winreg');
@@ -86,27 +104,15 @@
         //   if (err)
         //     console.log('ERROR: '+err);
         //   else
-        //     for (var i=0; i<items.length; i++)
+        //     for (let i=0; i<items.length; i++)
         //       console.log('ITEM: '+items[i].name+'\t'+items[i].type+'\t'+items[i].value);
         //     }
         // );
 
-        let app = this.$remote.app
-        var basepath = app.getAppPath();
-
         let child = require('child_process').execFile;
-        let path = require('path')
 
-        console.log(basepath)
-        console.log(basepath)
-        console.log(basepath)
-        let executablePath = path.join(basepath, 'bundled/openPhoto.cmd');
-        let parameters = [""];
+        this.saveTemp();
 
-        child(executablePath, parameters, function(err, data) {
-             console.log(err)
-             console.log(data.toString());
-        });
       },
       async copyToClipboard() {
         // navigator.clipboard.writeText(blob)
@@ -124,18 +130,50 @@
         } catch(err) { console.error(err.name, err.message); }
 
       },
+      saveTemp() {
+        try {
+          let time = this.screenshotTimestamp;
+
+          if (!fs.existsSync(this.tmpFilePath)) {
+            
+            fs.appendFileSync(
+              this.tmpFilePath,
+              this.screenshot.img.slice(23),
+              {encoding: 'base64'}
+            );
+
+            this.tempFile = time;
+          } else {
+            console.log('file already exists')
+          }
+        } catch(err) {
+          console.log('Temp Filewrite Error: ' + err.message);
+        }
+      },
       async saveAs() {
         try {
           // let blob = await this.convertBase64ToBlob();
 
-          let res = await this.$remote.dialog.showSaveDialog()
+          let savePath = path.join(os.homedir(), 'Pictures', 'Screenshot_'+this.screenshotTimestamp)
+
+          let res = await this.$remote.dialog.showSaveDialog({
+            defaultPath: savePath,
+            filters: [{
+              name: `Compressed JPEG Image`,
+              extensions: ['jpg']
+            }],
+            properties: { createDirectory: true, dontAddToRecent: false}
+          })
 
           if (res.canceled === true) {
             return 0
           } else {
 
-            // fs.appendFileSync(res.filePath, this.screenshot[this.screenshotId].split(';base64,').pop(), {encoding: 'base64'})
-            fs.appendFileSync(res.filePath, this.screenshot[this.screenshotId].slice(23), {encoding: 'base64'})
+            // fs.appendFileSync(res.filePath, this.screenshots.split(';base64,').pop(), {encoding: 'base64'})
+            await fs.writeFileSync(res.filePath, this.screenshot.img.slice(23), {encoding: 'base64'}, (err) => {
+              console.log(err);
+            })
+            this.fileSaved = true;
             // let buffer = await blob.arrayBuffer();
             // fs.appendFileSync(res.filePath, Buffer.from(buffer));
             // buffer = null;

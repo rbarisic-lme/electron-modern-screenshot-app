@@ -4,14 +4,14 @@
     <div class="visible-group">
       <div class="screenshots">
         <div class="image" v-for="index of screenshotCount" :key="index">
-          <img alt="" :src="screenshot[index-1]">
-          <ScreenshotBar :screenshotId="index-1"/>
+          <img alt="" :src="screenshots[index-1].img">
+          <ScreenshotBar :screenshotId="index-1" :screenshotTimestamp="screenshots[index-1].timestamp"/>
         </div>
       </div>
 
       <div>
         <TimeUntilDestroy v-if="useTimer" :timer="8000" :parentRef="$el"/>
-        <button v-else class="sbar-button" @click="$store.dispatch('resetScreenshots')">
+        <button v-else class="sbar-button" @click="closeman">
           Close</button>
       </div>
 
@@ -23,6 +23,7 @@
   import { mapState } from 'vuex'
   import TimeUntilDestroy from '@/components/TimeUntilDestroy.vue'
   import ScreenshotBar from '@/components/ScreenshotBar.vue'
+  import { webFrame, remote, ipcRenderer } from 'electron'
 
 export default {
   name: 'MainComponent',
@@ -46,12 +47,15 @@ export default {
     screenshotCount() {
       return this.$store.getters['getScreenshotCount']
     },
-    ...mapState(['screenshot']),
+    ...mapState(['screenshots']),
   },
   watch: {
 
   },
   methods: {
+    closeman() {
+      ipcRenderer.send('sync', 'restart')
+    },
     log() {
       // console.log(window)
     },

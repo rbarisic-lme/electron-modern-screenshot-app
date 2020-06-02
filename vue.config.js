@@ -1,14 +1,35 @@
+const MakeDirWebpackPlugin = require('make-dir-webpack-plugin');
+
 module.exports = {
   lintOnSave: false,
   assetsDir: 'assets',
   configureWebpack: {
+    plugins: [
+      new MakeDirWebpackPlugin({
+        dirs: [
+          { path: './dist_electron/temp' },
+        ]
+      })
+    ],
     resolve: {
       alias: {
         // '@': path.join(__dirname, 'client'),
         // '@UI':  thisPath + '/components/UI',
         // '@Config': thisPath + '/config/config.js',
       }
-    }
+    },
+    // module: {
+    //   rules: [
+    //     {
+    //       test: /\.(png|jpg|gif|svg|mp3|ogg|flac|ico|cmd|bat)$/,
+    //       loader: 'file-loader',
+    //       options: {
+    //       //   name: '[name].[ext]?[hash]'
+    //         esModule: false
+    //       }
+    //     },
+    //   ]
+    // },
   //   optimization: {
   //     splitChunks: {
   //       cacheGroups: {
@@ -21,6 +42,24 @@ module.exports = {
   //       },
   //     },
   //   },
+  },
+  pluginOptions: {
+    electronBuilder: {
+      builderOptions: {
+        "appId": "com.xrlabs.modernScreenshots",
+        "productName": "modern_screenshots",
+        "copyright": "Copyright © 2020 Robert Barisic, xrlabs",
+        "extraResources": [
+          {
+            "from": "./buildResources/",
+            "to": "resources",
+            "filter": [
+              "**/*"
+            ]
+          }
+        ]
+      },
+    }
   },
   // pluginOptions: {
     // "style-resources-loader": {

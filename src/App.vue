@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <!-- <FlashScreen v-if="screenshot !== null"/> -->
+    <!-- <FlashScreen v-if="screenshots !== null"/> -->
     <MainComponent v-if="screenshotCount > 0"/>
-    <button class="sbar-button" @click="$store.dispatch('makeScreenshot');">Make Screenshot</button>
+    <!-- <button class="sbar-button" @click="$store.dispatch('makeScreenshots');">Make Screenshots</button> -->
   </div>
 </template>
 
@@ -28,14 +28,14 @@ export default {
     },
   },
   mounted() {
-    this.$remote.globalShortcut.unregisterAll();
+    this.$remote.globalShortcut.unregister('CommandOrControl+Shift+Printscreen');
     this.$remote.globalShortcut.register('CommandOrControl+Shift+Printscreen', () => {
-        this.makeScreenshot();
+        this.makeScreenshots();
     })
 
     ipcRenderer.on('vuex', (event, arg) => {
-      if (arg === 'makeScreenshot') {
-        this.$store.dispatch('makeScreenshot');        
+      if (arg === 'makeScreenshots') {
+        this.$store.dispatch('makeScreenshots');        
       }
     })
   },
@@ -47,8 +47,8 @@ export default {
   },
   methods: {
     //win.focus() on capture
-    makeScreenshot() {
-      this.$store.dispatch('makeScreenshot')
+    makeScreenshots() {
+      this.$store.dispatch('makeScreenshots')
     }
   },
 }
