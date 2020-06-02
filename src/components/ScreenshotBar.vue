@@ -21,6 +21,8 @@
   import path from 'path';
   import os from 'os';
 
+  import {getRealAppPath, getRealResourcesPath} from '@/utils.js'
+
   export default {
     name: 'ScreenshotBar',
     components: {
@@ -32,8 +34,6 @@
         copiedToClipboardTimerId: null,
         fileSaved: false,
         fileSavedTimerId: null,
-        tempFile: null,
-
       }
     },
     props: {
@@ -48,14 +48,15 @@
       //   return this.screenshots
       // },
       app() { return this.$remote.app },
-      basepath() { return this.app.getAppPath() },
-      tmpFilePath() { return this.basepath + '/temp/'+this.screenshotTimestamp+'.jpg'; },
+      basepath() { return getRealAppPath() },
+      // baseUrl() { return process.env.BASE_URL },
+      tmpFilePath() { return path.join(getRealResourcesPath(), this.screenshotTimestamp+'.jpg'); },
       screenshot() {
         return this.$store.getters.getScreenshotByTimestamp(this.screenshotTimestamp)
       }
     },
     mounted() {
-
+      console.log(getRealAppPath());
     },
     watch: {
       fileSaved () {
@@ -85,6 +86,9 @@
       resetApp() {
         this.$store.dispatch('resetScreenshots', null);
       },
+      tempFileExists() {
+        return fs.existsSync(this.tmpFilePath)
+      },
       editImage() {
         // console.log(process.env.windir = 'C:\\Windows')
 
@@ -109,9 +113,23 @@
         //     }
         // );
 
+        this.saveTemp();
         let child = require('child_process').execFile;
 
-        this.saveTemp();
+        let executablePath = path.join(getRealResourcesPath(), 'openPhoto.cmd');
+        let parameters = [this.tmpFilePath];
+
+        child(executablePath, parameters, function(err, data) {
+             console.log(err)
+             console.log(data.toString());
+        });
+
+        // let child = require('child_process').execFile;
+        // console.log(fs.existsSync(path.join(getRealResourcesPath(), 'openPhoto.cmd')))
+
+        // child(path.join(getRealResourcesPath(), 'openPhoto.cmd'), [this.tmpFilePath], (err, stdout, stderr) => {
+        //   console.log(err, stdout, stderr)
+        // });
 
       },
       async copyToClipboard() {
@@ -132,17 +150,12 @@
       },
       saveTemp() {
         try {
-          let time = this.screenshotTimestamp;
-
-          if (!fs.existsSync(this.tmpFilePath)) {
-            
+          if (!this.tempFileExists()) {
             fs.appendFileSync(
               this.tmpFilePath,
               this.screenshot.img.slice(23),
               {encoding: 'base64'}
             );
-
-            this.tempFile = time;
           } else {
             console.log('file already exists')
           }
@@ -170,7 +183,8 @@
           } else {
 
             // fs.appendFileSync(res.filePath, this.screenshots.split(';base64,').pop(), {encoding: 'base64'})
-            await fs.writeFileSync(res.filePath, this.screenshot.img.slice(23), {encoding: 'base64'}, (err) => {
+            await fs.writeFileSync(res.filePath, this.screenshot.img.slice(23), {encoding: 'base64'}, (res, err) => {
+              console.log(res);
               console.log(err);
             })
             this.fileSaved = true;

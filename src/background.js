@@ -88,6 +88,7 @@ app.on('ready', async () => {
     }
   };
 
+  if (isDevelopment) {
     winSettings.frame = true;
     winSettings.closable = true;
     winSettings.resizable = true;
@@ -95,6 +96,7 @@ app.on('ready', async () => {
     winSettings.alwaysOnTop= false;
     winSettings.height = 700;
     winSettings.width = 1200;
+  }
 
   win = new BrowserWindow(winSettings)
 

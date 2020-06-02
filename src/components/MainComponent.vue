@@ -66,10 +66,10 @@ export default {
 
     this.$el.addEventListener('mouseenter', () => {
       this.$store.commit('setMouseActive', true)
-      console.log('its entering')
+      // console.log('its entering')
     });
     this.$el.addEventListener('mouseleave', () => {
-      console.log('its leaving')
+      // console.log('its leaving')
       this.$store.commit('setMouseActive', false)
     });
   }
