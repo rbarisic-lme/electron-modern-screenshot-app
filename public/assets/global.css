@@ -19,7 +19,7 @@ div.icon svg {
 }
 
 button, .btn {
-  display: inline-block;
+  display: inline-flex;
   border: 1px solid #555;
   padding:  8px;
   background: rgba(0,0,0,0.7);

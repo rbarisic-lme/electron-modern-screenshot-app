@@ -73,7 +73,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
 .main-component {
   margin:  0 auto;
   width:  auto;
@@ -90,35 +90,31 @@ export default {
   display: inline-flex;
   max-width: 100%;
   justify-content: space-between;
+  .image {
+    position: relative;
+    display: block;
+    height:  200px;
+    margin: 8px;
+    &:hover {
+      img {
+        border:  1px solid #fff;
+      }
+    }
+    img, {
+      height:  calc(100% - 4px);
+      padding: 2px;
+      border:  1px solid rgba(255,255,255,0.3);
+    }
+  }
 }
 
-.screenshots .image {
-  position: relative;
-  display: block;
-  height:  200px;
-  margin: 8px;
-}
-
-.screenshots .image img {
-  height:  calc(100% - 4px);
-  padding: 2px;
-  border:  1px solid rgba(255,255,255,0.3);
-}
-
-.screenshots .image img:hover {
-  border:  1px solid #fff;
-}
-
-.screenshots .image .screenshot-bar {
+.image .screenshot-bar {
   transition: opacity .1s ease-in-out;
-  opacity: 0;
+  opacity: 0.4;
 }
 
-.screenshots .image:hover .screenshot-bar {
-  opacity:  0.5;
+.image:hover .screenshot-bar {
+  opacity:  1;
 }
 
-.screenshots .image .screenshot-bar:hover {
-  opacity: 1;
-}
 </style>

@@ -8,6 +8,10 @@ import { remote } from 'electron'
 import upperFirst from 'lodash/upperFirst'
 import camelCase from 'lodash/camelCase'
 
+import UniqueId from 'vue-unique-id';
+
+Vue.use(UniqueId);
+
 // import mitt from 'mitt'
 
 Vue.prototype.$remote = remote;

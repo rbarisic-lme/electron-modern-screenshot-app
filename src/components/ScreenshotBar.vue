@@ -1,9 +1,9 @@
 <template>
   <div class="screenshot-bar">
-    <button class="sbar-button" @click="editImage" v-tooltip="'Edited'" v-tooltip-on="true">
+    <button class="sbar-button" @click="editImage">
       <CropIcon/> Edit
     </button>
-    <button class="sbar-button" @click="copyToClipboard" v-tooltip="'successfully saved!'" v-tooltip-on="2">
+    <button class="sbar-button" @click="copyToClipboard" v-tooltip="'copied to clipboard'" v-tooltip-on="copiedToClipboard">
       <ClipboardIcon/> Copy to Clipboard
     </button>
     <button class="sbar-button" @click="saveAs">
@@ -20,6 +20,8 @@
   // import 'vue-toast-notification/dist/theme-default.css';
   import { mapState } from 'vuex'
   
+  import Vue from 'vue';
+
   export default {
     name: 'ScreenshotBar',
     components: {
@@ -27,6 +29,8 @@
     },
     data: function() {
       return {
+        copiedToClipboard: false,
+        copiedToClipboardTimerId: null
       }
     },
     props: {
@@ -44,7 +48,15 @@
     mounted() {
     },
     watch: {
-
+      copiedToClipboard () {
+        if (this.copiedToClipboard === true) {
+          if (this.copiedToClipboardTimerId !== null) {
+            clearTimeout(this.copiedToClipboardTimerId);
+            this.copiedToClipboardTimerId = null;
+          }
+          this.copiedToClipboardTimerId = setTimeout(() => { this.copiedToClipboard = false}, 500)
+        }
+      }
     },
     methods: {
       async convertBase64ToBlob() {
@@ -106,7 +118,9 @@
           await navigator.clipboard.write([
             new ClipboardItem({[blob.type]: blob})
           ]);
-          // console.log('Image copied.');
+          this.copiedToClipboard = true;
+
+          // console.log('Image copiedToClipboard.');
         } catch(err) { console.error(err.name, err.message); }
 
       },

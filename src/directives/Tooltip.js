@@ -1,5 +1,5 @@
 //     // var s = JSON.stringify
-//     // el.innerHTML =
+//     // vnode.elm.innerHTML =
 //     //   'name: '       + s(binding.name) + '<br>' +
 //     //   'value: '      + s(binding.value) + '<br>' +
 //     //   'expression: ' + s(binding.expression) + '<br>' +
@@ -10,30 +10,25 @@
 
 import Vue from 'vue'
 
-let tooltip = document.createElement('div');
-let styles = [];
-tooltip.className = "tooltip";
+let tooltips = {}
+let styles = {};
+let timers = {}
 
 export const Tooltip = {
   name: 'Tooltip',
   inserted() {
 
   },
-  bind(el, bind) {
+  bind(el, bind, vnode) {
+    let uid = vnode.context._uid;
+
+    tooltips[uid] = document.createElement('div');
+    tooltips[uid].className = "tooltip";
     // Use this to get real data from the DOM
     Vue.nextTick(function () {
       // DOM updated
 
-      styles = [
-      ['position', 'fixed'],
-      ['left', el.getBoundingClientRect().x + 'px'],
-      ['top', el.getBoundingClientRect().y - 32 - 8 + 'px'],
-      ['color', '#fff'],
-      ['background', '#000'],
-      ['padding', '8px']
-      ];
-
-      tooltip.innerHTML = `
+      tooltips[uid].innerHTML = `
       <div class="tooltip-content">
       ${bind.value}
       </div>
@@ -51,22 +46,38 @@ export const TooltipOn = {
   },
   bind(/*el, bind, vnode*/) {
   },
-  update(el, bind) {
+  update(el, bind, vnode) {
+    let uid = vnode.context._uid;
+
     Vue.nextTick(function () {
       if (bind.value === true) {
-        document.getElementById('app').appendChild(tooltip);
+        if (timers[uid] !== null) { clearTimeout(timers[uid]); timers[uid] = null;}
 
-        for(let style of styles) {
+      styles[uid] = [
+        ['position', 'fixed'],
+        ['left', vnode.elm.getBoundingClientRect().x + 'px'],
+        ['top', vnode.elm.getBoundingClientRect().y - 32 - 8 + 'px'],
+        ['color', '#fff'],
+        ['background', '#000'],
+        ['padding', '8px']
+      ];
+
+
+        document.getElementById('app').appendChild(tooltips[uid]);
+
+        for(let style of styles[uid]) {
           try {
-            tooltip.style[style[0]] = style[1] 
+            tooltips[uid].style[style[0]] = style[1] 
           } catch(err) {
             console.log('Tooltip Error: ' + err.message);
           }
         }
 
-        setTimeout(() => {
-          tooltip.remove();
-        }, 1500)
+        timers[uid] = setTimeout(() => {
+          tooltips[uid].remove();
+          console.log(vnode)
+          console.log(uid)
+        }, 500)
       }
     });
   }
